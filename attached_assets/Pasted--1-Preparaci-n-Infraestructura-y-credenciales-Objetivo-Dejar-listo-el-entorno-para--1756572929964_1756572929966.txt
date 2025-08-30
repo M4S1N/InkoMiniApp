@@ -1,0 +1,156 @@
+## 1️⃣ Preparación (Infraestructura y credenciales)
+
+🔧 **Objetivo:** Dejar listo el entorno para trabajar.
+
+* [ ] **Repositorio GitHub**:
+
+  * Crear repo `inko-mini-app`.
+  * README inicial con descripción breve del reto.
+
+* [ ] **Credenciales necesarias**:
+
+  * Cuenta Google (para Google Sheets + Gmail).
+  * n8n (local o nube).
+  * API Key de proveedor IA (ej: OpenAI, Gemini o Claude).
+
+* [ ] **Archivos del negocio (del PDF 1)**:
+
+  * Catálogo de materiales/servicios con precios.
+  * Reglas de cotización (mínimo \$800, urgencia +30%, instalación +500).
+  * Correo de recepción: `flavio@inkoimpresores.com`.
+  * Teléfono de ventas (solo informativo).
+
+📦 **Entregable:** Repositorio inicial + cuentas/credenciales confirmadas.
+
+---
+
+## 2️⃣ Frontend – Formulario de Captura (Replit/Cursor)
+
+🔧 **Objetivo:** Capturar leads de forma sencilla y con logo de INKO.
+
+* [ ] Formulario con campos:
+
+  * Nombre.
+  * Correo electrónico o teléfono.
+  * Tipo de material (select con: Lona, Vinil, Microperforado, PVC, Acrílico).
+  * Medidas (ej. 2x1.5 m, número de piezas).
+  * Instalación (checkbox).
+  * Urgencia (checkbox 24h).
+  * Comentario libre.
+
+* [ ] Validaciones básicas: correo válido, campos requeridos.
+
+* [ ] Branding: agregar logo de INKO (PNG).
+
+* [ ] Conexión: enviar datos al webhook de n8n.
+
+📦 **Entregable:** Link al formulario funcional (Replit/Cursor).
+
+---
+
+## 3️⃣ Automatización en n8n – Flujo del Lead
+
+🔧 **Objetivo:** Procesar el lead, aplicar IA y reglas de negocio.
+
+### Flujo recomendado:
+
+1. **Webhook (entrada)** → recibe datos del formulario o WhatsApp.
+2. **Node IA (ej. OpenAI Chat)** → interpreta texto, clasifica interés (alto/medio/bajo).
+3. **Node Código (JavaScript)** → cálculo de cotización:
+
+   * Precio base = m² × precio unitario.
+   * Urgencia: +30%.
+   * Instalación: +\$500.
+   * Pedido mínimo: \$800.
+4. **Google Sheets Node** → guardar lead + clasificación + cotización.
+5. **Email Node** → enviar correo a `flavio@inkoimpresores.com` con:
+
+   * Nombre y contacto del lead.
+   * Material y medidas.
+   * Instalación / urgencia.
+   * Cotización generada.
+   * Nivel de interés.
+
+📦 **Entregable:** Flujo de n8n funcionando (captura + JSON export).
+
+---
+
+## 4️⃣ Integración con WhatsApp (simulación en n8n)
+
+🔧 **Objetivo:** Simular conversación con el lead.
+
+* [ ] Crear nodo inicial que simule un mensaje por WhatsApp.
+* [ ] IA responde con:
+
+  * Materiales disponibles.
+  * Cotización en tiempo real.
+  * Preguntar si desea instalación o urgencia.
+* [ ] Continuar flujo → guardar y enviar igual que en el formulario.
+
+📦 **Entregable:** Captura del chat simulado en n8n.
+
+---
+
+## 5️⃣ Base de Datos – Google Sheets
+
+🔧 **Objetivo:** Tener histórico de leads.
+
+* [ ] Crear Google Sheet con columnas:
+
+  * Nombre, Contacto, Material, Medidas, Instalación, Urgencia, Cotización, Interés, Fecha.
+* [ ] Configurar acceso API en n8n.
+* [ ] Probar inserción desde formulario y desde WhatsApp.
+
+📦 **Entregable:** Link a Google Sheet con al menos 3 registros de prueba.
+
+---
+
+## 6️⃣ Notificación – Correo Automático
+
+🔧 **Objetivo:** Asegurar seguimiento inmediato.
+
+* [ ] Usar `Email Node (SMTP)` en n8n con Gmail o Mailgun.
+* [ ] Correo debe contener:
+
+  * Datos completos del lead.
+  * Cotización estimada.
+  * Clasificación de interés.
+
+📦 **Entregable:** Captura del correo recibido por INKO.
+
+---
+
+## 7️⃣ Documentación – README (GitHub)
+
+🔧 **Objetivo:** Explicar tu solución en una página.
+
+* [ ] **Arquitectura**:
+
+  * Formulario (Replit) → n8n → IA → Google Sheets → Correo.
+* [ ] **Decisiones técnicas**:
+
+  * Por qué n8n, elección de IA, manejo de mínimos.
+* [ ] **Variables/credenciales**:
+
+  * API Key IA, Google credentials, SMTP.
+* [ ] **Retos encontrados**:
+
+  * Ejemplo: parsing de medidas en texto, validación de urgencia.
+* [ ] **Qué mejorarías**:
+
+  * Dashboard en tiempo real, pagos online, integración real con WhatsApp.
+
+📦 **Entregable:** README en GitHub (máx 1 página).
+
+---
+
+## 8️⃣ Validación con escenarios del PDF
+
+🔧 **Objetivo:** Probar con casos reales.
+
+* [ ] Escenario 1: vinil microperforado 5m² sin urgencia → \$1,100.
+* [ ] Escenario 2: PVC 2m² urgente → mínimo \$800.
+* [ ] Escenario 3: acrílico 1.2m² con instalación → \$980.
+* [ ] Validar que se guarda en Google Sheet + correo enviado.
+
+📦 **Entregable:** Evidencia de las 3 pruebas funcionando.
