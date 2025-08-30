@@ -16,8 +16,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">I</span>
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+                <img src="/inko-logo.png" alt="INKO Logo" className="w-12 h-12" />
               </div>
               <div className="hidden md:block">
                 <h1 className="text-xl font-bold text-primary">INKO Impresores</h1>
@@ -141,8 +141,8 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                  <span className="text-accent-foreground font-bold">I</span>
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                  <img src="/inko-logo.png" alt="INKO Logo" className="w-10 h-10" />
                 </div>
                 <h5 className="text-xl font-bold">INKO Impresores</h5>
               </div>
@@ -152,17 +152,17 @@ const Home: React.FC = () => {
               </p>
             </div>
             <div>
-              <h6 className="font-semibold mb-4">Servicios</h6>
-              <ul className="space-y-2 text-primary-foreground/80">
-                <li>Impresión en Lona</li>
-                <li>Vinil Adhesivo</li>
-                <li>Microperforado</li>
-                <li>PVC y Acrílico</li>
-                <li>Instalación Profesional</li>
-              </ul>
+              <h6 className="font-semibold text-lg mb-4">Servicios</h6>
+              <div className="text-primary-foreground/80 text-sm">
+                <p className="mb-2">• Impresión en Lona</p>
+                <p className="mb-2">• Vinil Adhesivo</p>
+                <p className="mb-2">• Microperforado</p>
+                <p className="mb-2">• PVC y Acrílico</p>
+                <p className='mb-4'>• Instalación Profesional</p>
+              </div>
             </div>
             <div>
-              <h6 className="font-semibold mb-4">Tecnología</h6>
+              <h6 className="font-semibold text-lg mb-4">Tecnología</h6>
               <div className="text-primary-foreground/80 text-sm">
                 <p className="mb-2">• Asistente IA para cotizaciones</p>
                 <p className="mb-2">• Integración con n8n</p>
