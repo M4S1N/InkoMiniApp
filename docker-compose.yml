@@ -1,0 +1,41 @@
+services:
+  n8n:
+    build:
+      context: ./workflows
+      dockerfile: Dockerfile
+    container_name: inkominiapp-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_HOST=n8n
+      - N8N_PORT=5678
+      - N8N_SECURE_COOKIE=false
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_LOG_LEVEL=debug
+      - N8N_ENCRYPTION_KEY=Xl/n1DPl4zTmYI1bEIlaN/IM3fU7t7cy
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: inkominiapp-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - n8n
+    networks:
+      - internal
+
+volumes:
+  n8n_data:
+
+networks:
+  internal:
+    driver: bridge

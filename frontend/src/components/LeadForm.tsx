@@ -39,6 +39,8 @@ const materialIcons = {
   acrilico: <Gem size={32} />
 };
 
+const webhookLeadsUrl = process.env.REACT_APP_WEBHOOK_LEADS_URL;
+
 const LeadForm: React.FC = () => {
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,25 +62,50 @@ const LeadForm: React.FC = () => {
     },
   });
 
+  function getQuoteResult(values: LeadFormData) {
+    const MATERIALS_PRICES: Record<string, number> = {
+      lona: 120,
+      vinil: 180,
+      microperforado: 220,
+      pvc: 250,
+      acrilico: 400,
+    };
+    const metrosCuadrados = values.ancho * values.alto * values.piezas;
+    let subtotal = (MATERIALS_PRICES[values.material] || 0) * metrosCuadrados;
+    let total = subtotal;
+    if (values.instalacion) total += 500;
+    if (values.urgencia) total *= 1.3;
+    if (total < 800) total = 800;
+    return {
+      material: MATERIALS[values.material]?.name,
+      area: metrosCuadrados,
+      subtotal,
+      total: Math.round(total),
+      instalacion: values.instalacion,
+      urgencia: values.urgencia,
+    };
+  }
+
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
     try {
-      // Aquí se enviaría a tu webhook de n8n
-      const response = await fetch('/api/leads', {
+      // Calcular cotización
+      const quote = getQuoteResult(data);
+
+      // Enviar a webhook
+      const response = await fetch(`${webhookLeadsUrl}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        const result = await response.json();
         showToast({
           title: "¡Cotización enviada!",
-          description: `Tu solicitud ha sido procesada. Cotización: $${result.lead?.cotizacion?.toLocaleString('es-MX') || 'Calculando...'}`,
+          description: `Tu solicitud ha sido procesada. Cotización: $${quote.total.toLocaleString('es-MX')}`,
           type: 'success'
         });
+        window.dispatchEvent(new CustomEvent('quote-updated', { detail: null }));
         form.reset();
         setSelectedMaterial("");
       } else {
@@ -100,37 +127,11 @@ const LeadForm: React.FC = () => {
     if (values.material && values.ancho && values.alto && values.piezas) {
       setIsCalculating(true);
       try {
-        const MATERIALS_PRICES: Record<string, number> = {
-          lona: 120,
-          vinil: 180,
-          microperforado: 220,
-          pvc: 250,
-          acrilico: 400,
-        };
-
-        const metrosCuadrados = values.ancho * values.alto * values.piezas;
-        let subtotal = (MATERIALS_PRICES[values.material] || 0) * metrosCuadrados;
-        let total = subtotal;
-
-        if (values.instalacion) total += 500;
-        if (values.urgencia) total *= 1.3;
-        if (total < 800) total = 800;
-
-        // Emitir evento para QuoteDisplay
-        window.dispatchEvent(new CustomEvent('quote-updated', {
-          detail: {
-            material: MATERIALS[values.material]?.name,
-            area: metrosCuadrados,
-            subtotal,
-            total: Math.round(total),
-            instalacion: values.instalacion,
-            urgencia: values.urgencia,
-          }
-        }));
-
+        const quote = getQuoteResult(values);
+        window.dispatchEvent(new CustomEvent('quote-updated', { detail: quote }));
         showToast({
           title: "Cotización calculada",
-          description: `Total estimado: $${Math.round(total).toLocaleString('es-MX')}`,
+          description: `Total estimado: $${quote.total.toLocaleString('es-MX')}`,
           type: 'success'
         });
       } catch (error) {

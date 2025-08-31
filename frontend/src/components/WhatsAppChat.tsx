@@ -8,6 +8,8 @@ interface Message {
   timestamp: string;
 }
 
+const webhookWhatsAppUrl = process.env.REACT_APP_WEBHOOK_WHATSAPP_URL;
+
 const WhatsAppChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -35,7 +37,7 @@ const WhatsAppChat: React.FC = () => {
 
     try {
       // Aquí se enviaría a tu webhook de n8n
-      const response = await fetch('/api/whatsapp', {
+      const response = await fetch(`${webhookWhatsAppUrl}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +49,7 @@ const WhatsAppChat: React.FC = () => {
         const data = await response.json();
         const botMessage: Message = {
           id: Date.now().toString() + "_bot",
-          text: data.response,
+          text: data.message,
           isBot: true,
           timestamp: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
         };
