@@ -8,7 +8,7 @@ interface Message {
   timestamp: string;
 }
 
-const webhookWhatsAppUrl = `http://localhost:5678/webhook/whatsapp`;
+const webhookWhatsAppUrl = `https://inkomini.app.n8n.cloud/webhook/message`;
 
 const WhatsAppChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -33,6 +33,7 @@ const WhatsAppChat: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setInputMessage(""); // Limpiar el input inmediatamente
     setIsSending(true);
 
     try {

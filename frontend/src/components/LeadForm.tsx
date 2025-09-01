@@ -13,7 +13,7 @@ const materialIcons: Record<string, JSX.Element> = {
   Acrílico: <Gem size={32} />
 };
 
-const webhookLeadsUrl = 'https://inkomini.app.n8n.cloud/webhook/leads';
+const leadsUrl = 'https://inkomini.app.n8n.cloud/webhook/pedido';
 const pricesUrl = 'https://inkomini.app.n8n.cloud/webhook/loadprices';
 
 const leadFormSchema = z.object({
@@ -61,12 +61,13 @@ const LeadForm: React.FC = () => {
     fetch(pricesUrl)
       .then(res => res.json())
       .then((data: PriceConfig[]) => {
-        if (Array.isArray(data) && data.length >= 2) {
-          setMaterials(data[0].materials);
+        if (Array.isArray(data) && data.length > 0) {
+          const config = data[0];
+          setMaterials(config.materials);
           setRules({
-            installation: data[1].installation ?? 0,
-            urgency: data[1].urgency ?? 0,
-            minimum: data[1].minimum ?? 0,
+            installation: config.installation ?? 0,
+            urgency: config.urgency ?? 0,
+            minimum: config.minimum ?? 0,
           });
         }
       })
@@ -100,8 +101,8 @@ const LeadForm: React.FC = () => {
     const price = mat ? mat["MXN/m²"] : 0;
     const area = values.ancho * values.alto * values.piezas;
     let total = price * area;
-    if (values.instalacion) total += rules.installation;
     if (values.urgencia) total *= 1 + rules.urgency / 100;
+    if (values.instalacion) total += rules.installation;
     if (total < rules.minimum) total = rules.minimum;
     return {
       material: mat?.Nombre || values.material,
@@ -116,18 +117,12 @@ const LeadForm: React.FC = () => {
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
     try {
-      // Calcular cotización
       const quote = getQuoteResult(data);
-
-      // Buscar el nombre largo del material
-      const mat = materials.find(m => m.Nombre === data.material);
-      const dataToSend = { ...data, material: mat?.Nombre || data.material };
-
       // Enviar a webhook
-      const response = await fetch(webhookLeadsUrl, {
+      const response = await fetch(leadsUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {

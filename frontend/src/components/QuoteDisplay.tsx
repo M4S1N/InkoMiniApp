@@ -47,16 +47,16 @@ const QuoteDisplay: React.FC = () => {
                   {quote.area?.toFixed(2)} m²
                 </span>
               </div>
-              {quote.instalacion && (
-                <div className="quote-item text-accent">
-                  <span className="text-sm font-medium">Instalación:</span>
-                  <span className="font-semibold">+$500</span>
-                </div>
-              )}
               {quote.urgencia && (
                 <div className="quote-item text-accent">
                   <span className="text-sm font-medium">Urgencia 24h:</span>
                   <span className="font-semibold">+30%</span>
+                </div>
+              )}
+              {quote.instalacion && (
+                <div className="quote-item text-accent">
+                  <span className="text-sm font-medium">Instalación:</span>
+                  <span className="font-semibold">+$500</span>
                 </div>
               )}
               <div className="quote-total">
