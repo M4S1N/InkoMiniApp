@@ -1,0 +1,252 @@
+{
+  "name": "Workflow Load Prices",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "loadprices",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        -144
+      ],
+      "id": "91256b6f-b5cf-444c-9e29-901e07c0d22d",
+      "name": "Webhook",
+      "webhookId": "cf6c37e8-0a62-45fa-981d-a985938e33f2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y",
+          "mode": "list",
+          "cachedResultName": "InkoMiniApp",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Materiales/Precios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -48,
+        -144
+      ],
+      "id": "94130678-4260-47f8-a4d1-c7b8d4c5ea06",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s8mNwP8Nqckrtqe0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        736,
+        16
+      ],
+      "id": "8e99c4f7-0187-4736-8cc0-270424f2cc2d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y",
+          "mode": "list",
+          "cachedResultName": "InkoMiniApp",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 389719604,
+          "mode": "list",
+          "cachedResultName": "Otros Precios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit#gid=389719604"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -48,
+        192
+      ],
+      "id": "717adad3-ac18-4741-b222-df9b60e7cafc",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s8mNwP8Nqckrtqe0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        16
+      ],
+      "id": "a6a52194-c9c4-4ca1-826c-86976430fe7f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtiene todos los items del nodo anterior (Google Sheets)\nconst rows = $input.all().map(item => item.json);\n\n// Inicializa el objeto de salida\nconst output = { installation: 0, urgency: 0, minimum: 0 };\n\n// Recorre cada fila y asigna según la columna \"Reglas\"\nfor (const row of rows) {\n  switch (row.Reglas) {\n    case \"Servicio de instalación\":\n      output.installation = row.Precio;\n      break;\n    case \"Urgencia\":\n      output.urgency = row.Precio;\n      break;\n    case \"Mínimo de producción\":\n      output.minimum = row.Precio;\n      break;\n    default:\n      // puedes ignorar otras reglas\n      break;\n  }\n}\n\n// Devuelve un solo item con json\nreturn [\n  {\n    json: output\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        192
+      ],
+      "id": "5df43f00-e563-42d5-8fc2-0361e7a4e275",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener todos los items del nodo anterior\nconst rows = $input.all().map(item => item.json);\n\n// Devolver un solo item con todos los materiales\nreturn {\n  materials: rows\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -144
+      ],
+      "id": "b36124b0-f3d2-4fbf-9bd1-172fe76ea6c6",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        192
+      ],
+      "id": "befbd56a-61d4-447d-a67e-a3eb4aa3aa81",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4a36b81c-4f57-4b78-8257-4d9896ee964e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c3679ccfc1bb3a493cfb0d63e2a468dab4addbeca62b77b992ed76cb85f37450"
+  },
+  "id": "Z9So8hUiLaZmtQ7Z",
+  "tags": []
+}

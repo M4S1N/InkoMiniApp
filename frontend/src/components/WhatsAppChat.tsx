@@ -8,7 +8,7 @@ interface Message {
   timestamp: string;
 }
 
-const webhookWhatsAppUrl = process.env.REACT_APP_WEBHOOK_WHATSAPP_URL;
+const webhookWhatsAppUrl = `http://localhost:5678/webhook/whatsapp`;
 
 const WhatsAppChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
