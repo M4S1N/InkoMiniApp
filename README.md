@@ -16,6 +16,7 @@ Construir una mini aplicación agéntica para INKO que:
 - **Frontend:** React (Cursor compatible), desplegado en [https://inko-mini-app.vercel.app/](https://inko-mini-app.vercel.app/)
 - **Automatización:** n8n, workflows en [https://inkomini.app.n8n.cloud/](https://inkomini.app.n8n.cloud/)
 - **Base de datos:** [Google Sheets](https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit?gid=0#gid=0) (vía n8n)
+- **Base de datos para memoria del agente:** Redis (Upstash). Persistencia de mensajes para que el agente recuerde conversaciones pasadas.
 - **Notificación:** Correo electrónico: flavio@inkoimpresores.com (vía n8n)
 - **IA:** Integración con OpenAI (o similar) para clasificación y cotización
 
@@ -33,6 +34,7 @@ Construir una mini aplicación agéntica para INKO que:
 - **React** para UI rápida y personalizable.
 - **n8n** para orquestar automatizaciones, integración con Google Sheets y correo.
 - **Google Sheets** como base de datos simple y accesible.
+- **Redis (Upstash)** para persistencia de memoria del agente, manteniendo contexto entre mensajes y pedidos.
 - **OpenAI API** para IA (clasificación y cotización).
 - **Docker** para despliegue local y productivo.
 - **Vercel** para hosting frontend.
@@ -43,6 +45,7 @@ Construir una mini aplicación agéntica para INKO que:
 
 - **n8n:** API Key/credenciales para Google Sheets y correo.
 - **OpenAI:** API Key para clasificación/cotización.
+- **Redis (Upstash):** URL, username, password o API Key según configuración.
 - **Correo destino:** Proporcionado por INKO.
 
 ---
