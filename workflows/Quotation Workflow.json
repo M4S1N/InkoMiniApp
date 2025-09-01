@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -752,
+        -496,
         -32
       ],
       "id": "24f0b3b7-a611-4e6a-9555-50da710f640d",
@@ -39,7 +39,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -464,
+        -208,
         -32
       ],
       "id": "c410d2a0-e916-41ea-b805-ac40431e6d2d",
@@ -48,16 +48,16 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Entrada:\nLista de materiales con precios por m²: {{ JSON.stringify($json.materials) }}\n\nMensaje del cliente: {{ $('Webhook1').item.json.body.message }}\n\nInstrucciones paso a paso:\n\n1. Saluda y preséntate como asistente experto en pedidos de impresión. Puedes explicar brevemente qué haces. Puedes interactuar realizando conversaciones de forma natural, limitado al objetivo para el cual existes.\n\n2. Intenta extraer todos los campos del mensaje:\n   \"nombre\", \"contacto\", \"material\", \"alto\", \"ancho\", \"piezas\", \"instalacion\", \"urgencia\".\n\n3. Verifica los campos obligatorios: nombre, contacto, material, alto, ancho, piezas.\n\n4. Al identificar el material usa palabras claves del mensaje e infierelo de la lista de materiales, ejemplo: \"lona\" se refiere a Lona Frontlit 13 oz. En caso de que hayan varios indicale al usuario.\n\n5. Si todos los campos obligatorios están completos, devuelve únicamente **un JSON** con la siguiente estructura:\n\n{\n  \"pedido\": true,\n  \"nombre\": \"...\",\n  \"contacto\": \"...\",\n  \"material\": \"...\",\n  \"alto\": <number>,\n  \"ancho\": <number>,\n  \"piezas\": <number>,\n  \"instalacion\": <booleano>,\n  \"urgencia\": <booleano>\n}\n\n6. Si falta algún dato obligatorio, devuelve un JSON con:\n\n{\n  \"pedido\": false,\n  \"mensaje\": \"Pregunta natural al usuario solo por los campos faltantes. Ejemplos: 'No encontré tu correo, ¿podrías proporcionármelo?' o 'Me falta el alto y ancho de la lona, ¿cuáles son?'\"\n}\n\n7. Una vez el usuario responda con los datos faltantes, completa el JSON con toda la información recibida.\n",
+        "text": "=Entrada:\nLista de materiales con precios por m²: {{ JSON.stringify($json.materials) }}\n\nMensaje del cliente: {{ $('Webhook1').item.json.body.message }}\n\nInstrucciones paso a paso:\n\n1. Saluda y preséntate como asistente experto en pedidos de impresión. Puedes explicar brevemente qué haces. Puedes interactuar realizando conversaciones de forma natural, limitado al objetivo para el cual existes.\n\n2. Intenta extraer todos los campos del mensaje actual **y de la memoria de la conversación (Redis)**: \"nombre\", \"contacto\", \"material\", \"alto\", \"ancho\", \"piezas\", \"instalacion\", \"urgencia\".\n\n3. Verifica los campos obligatorios (nombre, contacto, material, alto, ancho, piezas). \n   - Si ya están completos en memoria, **no los vuelvas a pedir**.\n   - Si faltan, pregunta solo por esos.\n\n4. Al identificar el material usa palabras claves del mensaje e infierelo de la lista de materiales, ejemplo: \"lona\" se refiere a Lona Frontlit 13 oz. En caso de que hayan varios indicale al usuario.\n\n5. Si todos los campos obligatorios están completos, devuelve únicamente **un JSON** con la siguiente estructura:\n\n{\n  \"pedido\": true,\n  \"nombre\": \"...\",\n  \"contacto\": \"...\",\n  \"material\": \"...\",\n  \"alto\": <number>,\n  \"ancho\": <number>,\n  \"piezas\": <number>,\n  \"instalacion\": <booleano>,\n  \"urgencia\": <booleano>\n}\n\n6. Si falta algún dato obligatorio, devuelve un JSON con:\n\n{\n  \"pedido\": false,\n  \"mensaje\": \"Pregunta natural al usuario solo por los campos faltantes. Ejemplos: 'No encontré tu correo, ¿podrías proporcionármelo?' o 'Me falta el alto y ancho de la lona, ¿cuáles son?'\"\n}\n\n7. Una vez el usuario responda con los datos faltantes, completa el JSON con toda la información recibida.\n",
         "options": {
-          "systemMessage": "=Goal:\nProcesar mensajes de clientes y generar un JSON estructurado con los detalles del pedido.\n\nRole:\nEres un asistente experto en pedidos de impresión. Tu tarea es leer mensajes en lenguaje natural de los clientes y extraer los datos necesarios para crear un JSON con los campos:\n\"nombre\", \"contacto\", \"material\", \"alto\", \"ancho\", \"piezas\", \"instalacion\", \"urgencia\".\n\nSi algún campo obligatorio falta, NO inventes valores. En lugar de eso, interactúa con el usuario de forma natural, haciendo preguntas claras y amables para obtener la información que falta. Por ejemplo:\n- \"No pude identificar tu correo, ¿podrías indicármelo?\"\n- \"¿Podrías confirmarme cuántas piezas necesitas?\"\n\nUsa la lista de materiales proporcionada para asignar el material correcto. Mantén la conversación fluida y cercana, guiando al usuario paso a paso hasta completar todos los datos necesarios para generar el JSON.\n"
+          "systemMessage": "=Goal:\nProcesar mensajes de clientes y generar un JSON estructurado con los detalles del pedido.\n\nRole:\nEres un asistente experto en pedidos de impresión. Tienes acceso a la memoria de chat (Redis), donde se guardan los mensajes anteriores de este mismo cliente. \n\nInstrucciones clave:\n- Siempre consulta primero la memoria antes de preguntar al usuario.\n- No repitas preguntas si ya tienes el dato en memoria.\n- Si encuentras un campo en memoria, úsalo directamente en el JSON.\n- Solo pregunta de manera natural por los campos obligatorios que realmente falten.\n- Nunca inventes valores.\n- Al final, cuando tengas todo, devuelve únicamente el JSON solicitado.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        -1184,
-        464
+        -1248,
+        416
       ],
       "id": "f9aed35a-0a2d-4888-90f3-da73b24d0a3c",
       "name": "AI Agent"
@@ -74,8 +74,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -1232,
-        704
+        -1296,
+        656
       ],
       "id": "8edcbf1f-a66a-421a-8c92-4d9ea31ba330",
       "name": "OpenAI Chat Model",
@@ -148,7 +148,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        736,
+        944,
         -32
       ],
       "id": "674b3a77-c18b-4c8f-b40d-316d8b1b5f04",
@@ -171,7 +171,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        1104,
+        1312,
         -32
       ],
       "id": "6d74370e-db0e-43a3-a61d-ed186b8db03a",
@@ -191,8 +191,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -768,
-        464
+        -832,
+        416
       ],
       "id": "de913c54-eab9-4640-bd46-158487d6c87f",
       "name": "Code",
@@ -215,7 +215,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1408,
+        1616,
         -32
       ],
       "id": "1a85204e-7b69-4afc-8406-e845be5766e9",
@@ -228,7 +228,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        1712,
+        1920,
         -32
       ],
       "id": "41998903-cae8-4f3a-9ef8-66e11ace5ad2",
@@ -323,7 +323,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -128,
+        128,
         -32
       ],
       "id": "2dfa06bc-5ffa-4a99-9b2d-1b090555f1d7",
@@ -336,7 +336,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        336,
+        544,
         -32
       ],
       "id": "bb20a6d7-1f53-4ad3-b45a-92b940184e1d",
@@ -352,8 +352,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1776,
-        464
+        -2048,
+        416
       ],
       "id": "bf732cc4-c0d8-4265-a93b-7c40c94b0998",
       "name": "Webhook1",
@@ -380,8 +380,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -1456,
-        464
+        -1648,
+        416
       ],
       "id": "4712fb5a-92fd-4608-8ec7-b6a424ff8354",
       "name": "Execute Workflow1"
@@ -469,8 +469,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -128,
-        448
+        -192,
+        400
       ],
       "id": "0f6b8a42-111f-45b5-9616-ef1d34865604",
       "name": "Edit Fields2"
@@ -492,8 +492,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -128,
-        864
+        -192,
+        816
       ],
       "id": "0e58e96a-654d-4897-8f91-79ee12cf3cf5",
       "name": "Edit Fields3"
@@ -505,8 +505,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        208,
-        864
+        144,
+        816
       ],
       "id": "3a294dba-d0d2-4c9a-9e59-fb10970e2d95",
       "name": "Respond to Webhook1"
@@ -539,8 +539,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -448,
-        464
+        -512,
+        416
       ],
       "id": "9368ba32-1373-490d-9766-0217137bfb8c",
       "name": "If"
@@ -549,16 +549,43 @@
       "parameters": {
         "sessionIdType": "customKey",
         "sessionKey": "={{ $('Webhook1').item.json.headers['x-real-ip'] }}",
+        "sessionTTL": 300,
         "contextWindowLength": 20
       },
-      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-      "typeVersion": 1.3,
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
       "position": [
-        -1056,
-        704
+        -1104,
+        656
       ],
-      "id": "7c080426-7a18-4eae-9d47-43d4dd4e8f4a",
-      "name": "Simple Memory"
+      "id": "564de600-6a39-4951-9a57-ae45a01af6c0",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "d591io6ux1QJ1xSf",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Webhook1').item.json.headers['x-real-ip'] }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        144,
+        400
+      ],
+      "id": "030cf575-a38a-4c72-aafb-90d63ebebdf8",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "d591io6ux1QJ1xSf",
+          "name": "Redis account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -700,7 +727,7 @@
       "main": [
         [
           {
-            "node": "Code1",
+            "node": "Redis",
             "type": "main",
             "index": 0
           }
@@ -736,12 +763,23 @@
         ]
       ]
     },
-    "Simple Memory": {
+    "Redis Chat Memory": {
       "ai_memory": [
         [
           {
             "node": "AI Agent",
             "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
             "index": 0
           }
         ]
@@ -752,7 +790,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "71fdde43-6dcd-481c-ae6e-77a460e9e6d8",
+  "versionId": "62899bb8-1b0c-4c1d-b23b-bed0c6c55014",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c3679ccfc1bb3a493cfb0d63e2a468dab4addbeca62b77b992ed76cb85f37450"
