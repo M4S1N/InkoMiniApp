@@ -1,0 +1,762 @@
+{
+  "name": "Quotation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pedido",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        -32
+      ],
+      "id": "24f0b3b7-a611-4e6a-9555-50da710f640d",
+      "name": "Webhook",
+      "webhookId": "dd15afad-d10e-461a-9b4a-2d024e2ac5c3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Z9So8hUiLaZmtQ7Z",
+          "mode": "list",
+          "cachedResultName": "Workflow Load Prices"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "c410d2a0-e916-41ea-b805-ac40431e6d2d",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Entrada:\nLista de materiales con precios por m²: {{ JSON.stringify($json.materials) }}\n\nMensaje del cliente: {{ $('Webhook1').item.json.body.message }}\n\nInstrucciones paso a paso:\n\n1. Saluda y preséntate como asistente experto en pedidos de impresión. Puedes explicar brevemente qué haces. Puedes interactuar realizando conversaciones de forma natural, limitado al objetivo para el cual existes.\n\n2. Intenta extraer todos los campos del mensaje:\n   \"nombre\", \"contacto\", \"material\", \"alto\", \"ancho\", \"piezas\", \"instalacion\", \"urgencia\".\n\n3. Verifica los campos obligatorios: nombre, contacto, material, alto, ancho, piezas.\n\n4. Al identificar el material usa palabras claves del mensaje e infierelo de la lista de materiales, ejemplo: \"lona\" se refiere a Lona Frontlit 13 oz. En caso de que hayan varios indicale al usuario.\n\n5. Si todos los campos obligatorios están completos, devuelve únicamente **un JSON** con la siguiente estructura:\n\n{\n  \"pedido\": true,\n  \"nombre\": \"...\",\n  \"contacto\": \"...\",\n  \"material\": \"...\",\n  \"alto\": <number>,\n  \"ancho\": <number>,\n  \"piezas\": <number>,\n  \"instalacion\": <booleano>,\n  \"urgencia\": <booleano>\n}\n\n6. Si falta algún dato obligatorio, devuelve un JSON con:\n\n{\n  \"pedido\": false,\n  \"mensaje\": \"Pregunta natural al usuario solo por los campos faltantes. Ejemplos: 'No encontré tu correo, ¿podrías proporcionármelo?' o 'Me falta el alto y ancho de la lona, ¿cuáles son?'\"\n}\n\n7. Una vez el usuario responda con los datos faltantes, completa el JSON con toda la información recibida.\n",
+        "options": {
+          "systemMessage": "=Goal:\nProcesar mensajes de clientes y generar un JSON estructurado con los detalles del pedido.\n\nRole:\nEres un asistente experto en pedidos de impresión. Tu tarea es leer mensajes en lenguaje natural de los clientes y extraer los datos necesarios para crear un JSON con los campos:\n\"nombre\", \"contacto\", \"material\", \"alto\", \"ancho\", \"piezas\", \"instalacion\", \"urgencia\".\n\nSi algún campo obligatorio falta, NO inventes valores. En lugar de eso, interactúa con el usuario de forma natural, haciendo preguntas claras y amables para obtener la información que falta. Por ejemplo:\n- \"No pude identificar tu correo, ¿podrías indicármelo?\"\n- \"¿Podrías confirmarme cuántas piezas necesitas?\"\n\nUsa la lista de materiales proporcionada para asignar el material correcto. Mantén la conversación fluida y cercana, guiando al usuario paso a paso hasta completar todos los datos necesarios para generar el JSON.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1184,
+        464
+      ],
+      "id": "f9aed35a-0a2d-4888-90f3-da73b24d0a3c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1232,
+        704
+      ],
+      "id": "8edcbf1f-a66a-421a-8c92-4d9ea31ba330",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "vtQW8AMFdl3sDENy",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y",
+          "mode": "list",
+          "cachedResultName": "InkoMiniApp",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 237537567,
+          "mode": "list",
+          "cachedResultName": "Solicitudes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ozxPqtMGQ4Sv39VrtsceCAThTYrv-smArxQy6PxWu8Y/edit#gid=237537567"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead": "={{ $json.lead }}",
+            "Clasificacion": "={{ $json.clasificacion }}",
+            "Cotizacion": "={{ $json.cotizacion }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Lead",
+              "displayName": "Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Clasificacion",
+              "displayName": "Clasificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cotizacion",
+              "displayName": "Cotizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        -32
+      ],
+      "id": "674b3a77-c18b-4c8f-b40d-316d8b1b5f04",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s8mNwP8Nqckrtqe0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "miguel.asin4@gmail.com",
+        "toEmail": "miguel.asin98@gmail.com",
+        "subject": "Solicitud de Impresión",
+        "html": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Cotización INKO</title>\n<style>\n  body {\n    font-family: Arial, sans-serif;\n    background-color: #f6f6f6;\n    margin: 0;\n    padding: 0;\n  }\n  .container {\n    max-width: 600px;\n    margin: 20px auto;\n    background-color: #ffffff;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n  }\n  h2 {\n    color: #333333;\n    text-align: center;\n  }\n  table {\n    width: 100%;\n    border-collapse: collapse;\n    margin-top: 15px;\n  }\n  th, td {\n    text-align: left;\n    padding: 10px;\n    border-bottom: 1px solid #dddddd;\n  }\n  th {\n    background-color: #f2f2f2;\n  }\n  .highlight {\n    font-weight: bold;\n    color: #1a73e8;\n  }\n  .footer {\n    margin-top: 20px;\n    font-size: 12px;\n    color: #888888;\n    text-align: center;\n  }\n</style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2>Cotización Generada</h2>\n    <table>\n      <tr>\n        <th>Nombre</th>\n        <td>{{ $('Code1').item.json.nombre }}</td>\n      </tr>\n      <tr>\n        <th>Correo</th>\n        <td>{{ $('Code1').item.json.contacto }}</td>\n      </tr>\n      <tr>\n        <th>Material</th>\n        <td>{{ $('Code1').item.json.material }}</td>\n      </tr>\n      <tr>\n        <th>Medidas</th>\n        <td>{{ $('Code1').item.json.piezas }} pieza(s), {{ $('Code1').item.json.ancho }}x{{ $('Code1').item.json.alto }} m cada una</td>\n      </tr>\n      <tr>\n        <th>Urgencia</th>\n        <td>{{ $('Code1').item.json.urgencia ? \"Si (24h)\" : \"No\" }}</td>\n      </tr>\n      <tr>\n        <th>Instalación</th>\n        <td>{{ $('Code1').item.json.instalacion ? \"Si\" : \"No\" }}</td>\n      </tr>\n      <tr>\n        <th class=\"highlight\">Cotización generada</th>\n        <td class=\"highlight\">${{ $json.Cotizacion }} MXN</td>\n      </tr>\n      <tr>\n        <th class=\"highlight\">Nivel de interés</th>\n        <td class=\"highlight\">{{ $json.Clasificacion }}</td>\n      </tr>\n    </table>\n    <div class=\"footer\">\n      Este correo fue generado automáticamente por INKO. Por favor, no responda a este mensaje.\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        -32
+      ],
+      "id": "6d74370e-db0e-43a3-a61d-ed186b8db03a",
+      "name": "Send email",
+      "webhookId": "543debce-fcaf-4735-bad0-12d0c4c3a38d",
+      "credentials": {
+        "smtp": {
+          "id": "tYaWdHaD2lWpw38c",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.first().json.output;\n\nlet parsed;\ntry {\n    parsed = JSON.parse(output.replace(/\\\\n/g, '').trim());\n} catch(e) {\n    parsed = { pedido: false, mensaje: output };\n}\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        464
+      ],
+      "id": "de913c54-eab9-4640-bd46-158487d6c87f",
+      "name": "Code",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00f6af82-cd00-4450-8f5c-7eba1781434a",
+              "name": "message",
+              "value": "={{ $('Code1').item.json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1408,
+        -32
+      ],
+      "id": "1a85204e-7b69-4afc-8406-e845be5766e9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1712,
+        -32
+      ],
+      "id": "41998903-cae8-4f3a-9ef8-66e11ace5ad2",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00180799-3cf4-4bbe-b0d0-bf5020e32c0e",
+              "name": "Materiales",
+              "value": "={{ $json.materials }}",
+              "type": "array"
+            },
+            {
+              "id": "6bdf0ffd-3489-4997-9b74-64921236ab1a",
+              "name": "Precio de instalacion",
+              "value": "={{ $json.installation }}",
+              "type": "number"
+            },
+            {
+              "id": "2d6ae2ab-53e8-42df-bcf3-43e6e6875cfc",
+              "name": "Porcentaje de urgencia",
+              "value": "={{ $json.urgency }}",
+              "type": "number"
+            },
+            {
+              "id": "1e4c32e5-97c6-4d48-8585-3e9ebf658380",
+              "name": "Costo minimo",
+              "value": "={{ $json.minimum }}",
+              "type": "number"
+            },
+            {
+              "id": "10a41217-d124-4eb3-8da9-ed1c783263c0",
+              "name": "Nombre",
+              "value": "={{ $('Webhook').item.json.body.nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "3ea81db1-6230-48e2-ae4a-eee3972daf70",
+              "name": "Contacto",
+              "value": "={{ $('Webhook').item.json.body.contacto }}",
+              "type": "string"
+            },
+            {
+              "id": "e1478559-14f1-47a3-a221-8cf2be40f2c9",
+              "name": "Material",
+              "value": "={{ $('Webhook').item.json.body.material }}",
+              "type": "string"
+            },
+            {
+              "id": "e322978a-3ce0-48db-917a-8ed78afff533",
+              "name": "Ancho",
+              "value": "={{ $('Webhook').item.json.body.ancho }}",
+              "type": "number"
+            },
+            {
+              "id": "419fac30-b09a-4d0d-8a87-1cec1765e869",
+              "name": "Alto",
+              "value": "={{ $('Webhook').item.json.body.alto }}",
+              "type": "number"
+            },
+            {
+              "id": "491542dc-f807-4c28-b998-b75849016a16",
+              "name": "Piezas",
+              "value": "={{ $('Webhook').item.json.body.piezas }}",
+              "type": "number"
+            },
+            {
+              "id": "c0e76fe0-82d0-4167-8e3b-4b199e87e789",
+              "name": "Se necesita instalacion",
+              "value": "={{ $('Webhook').item.json.body.instalacion }}",
+              "type": "boolean"
+            },
+            {
+              "id": "49bbc8f6-67d8-47dd-9cc8-e4fe72413133",
+              "name": "Con urgencia",
+              "value": "={{ $('Webhook').item.json.body.urgencia }}",
+              "type": "boolean"
+            },
+            {
+              "id": "b345b2c9-0778-4f7b-8a80-6f6193d0b682",
+              "name": "Comentarios extras",
+              "value": "={{ $('Webhook').item.json.body.comentarios }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -32
+      ],
+      "id": "2dfa06bc-5ffa-4a99-9b2d-1b090555f1d7",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Entrada: item.json\nconst data = $json;\n\n// Verificar campos obligatorios\nconst camposFaltantes = [];\nif (!data.Nombre) camposFaltantes.push(\"Nombre\");\nif (!data.Contacto) camposFaltantes.push(\"Contacto\");\nif (!data.Material) camposFaltantes.push(\"Material\");\nif (!data.Alto) camposFaltantes.push(\"Alto\");\nif (!data.Ancho) camposFaltantes.push(\"Ancho\");\nif (!data.Piezas) camposFaltantes.push(\"Piezas\");\n\nif (camposFaltantes.length > 0) {\n  return [{\n    json: {\n      lead: \"\",\n      clasificacion: \"\",\n      cotizacion: 0,\n      message: `Parece que faltan los siguientes datos: ${camposFaltantes.join(\", \")}. ¿Nos los puedes indicar? `,\n      status: \"incompleta\"\n    }\n  }];\n}\n\n// Buscar precio por m² del material\nconst material = data.Materiales.find(m => m.Nombre === data.Material);\nconst precio_m2 = material ? material[\"MXN/m²\"] : 0;\n\n// Calcular área y precio base\nconst area_total = data.Alto * data.Ancho * data.Piezas;\nlet cotizacion = area_total * precio_m2;\n\n// Ajustar por urgencia\nif (data[\"Con urgencia\"]) {\n  cotizacion *= 1 + (data[\"Porcentaje de urgencia\"] / 100);\n}\n\n// Ajustar por instalación\nif (data[\"Se necesita instalacion\"]) {\n  cotizacion += data[\"Precio de instalacion\"];\n}\n\n// Verificar mínimo de producción\nif (cotizacion < data[\"Costo minimo\"]) {\n  cotizacion = data[\"Costo minimo\"];\n}\n\n// Clasificar interés\nlet clasificacion = \"medio\";\nif (data[\"Con urgencia\"] && camposFaltantes.length === 0) clasificacion = \"alto\";\nif (camposFaltantes.length > 0) clasificacion = \"bajo\";\n\n// Crear lead\nconst lead = `${data.Nombre} realizó un pedido de ${area_total} metros cuadrados de ${data.Material}`;\n\n// Devolver resultado\nreturn [{\n  json: {\n    lead,\n    clasificacion,\n    cotizacion: Math.round(cotizacion),\n    message: `Hemos recibido tu solicitud de ${area_total} metros cuadrados de ${data.Material}${data[\"Con urgencia\"] ? \" con urgencia para entrega mañana\": \"\"}${data[\"Se necesita instalacion\"] ? \" e instalación incluida\": \"\"}.\\nClasificación del pedido: ${clasificacion}.\\nCotización estimada: $${Math.round(cotizacion)} MXN\\n¡Gracias por confiar en nosotros!`,\n    nombre: data.Nombre,\n    contacto: data.Contacto,\n    material: data.Material,\n    alto: data.Alto,\n    ancho: data.Ancho,\n    piezas: data.Piezas,\n    urgencia: data[\"Con urgencia\"],\n    instalacion: data[\"Se necesita instalacion\"]\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -32
+      ],
+      "id": "bb20a6d7-1f53-4ad3-b45a-92b940184e1d",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "message",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1776,
+        464
+      ],
+      "id": "bf732cc4-c0d8-4265-a93b-7c40c94b0998",
+      "name": "Webhook1",
+      "webhookId": "937d7c35-5237-4940-9dd6-a58ec4f2decb"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Z9So8hUiLaZmtQ7Z",
+          "mode": "list",
+          "cachedResultName": "Workflow Load Prices"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -1456,
+        464
+      ],
+      "id": "4712fb5a-92fd-4608-8ec7-b6a424ff8354",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00180799-3cf4-4bbe-b0d0-bf5020e32c0e",
+              "name": "Materiales",
+              "value": "={{ $('Execute Workflow1').item.json.materials }}",
+              "type": "array"
+            },
+            {
+              "id": "6bdf0ffd-3489-4997-9b74-64921236ab1a",
+              "name": "Precio de instalacion",
+              "value": "={{ $('Execute Workflow1').item.json.installation }}",
+              "type": "number"
+            },
+            {
+              "id": "2d6ae2ab-53e8-42df-bcf3-43e6e6875cfc",
+              "name": "Porcentaje de urgencia",
+              "value": "={{ $('Execute Workflow1').item.json.urgency }}",
+              "type": "number"
+            },
+            {
+              "id": "1e4c32e5-97c6-4d48-8585-3e9ebf658380",
+              "name": "Costo minimo",
+              "value": "={{ $('Execute Workflow1').item.json.minimum }}",
+              "type": "number"
+            },
+            {
+              "id": "10a41217-d124-4eb3-8da9-ed1c783263c0",
+              "name": "Nombre",
+              "value": "={{ $json.nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "3ea81db1-6230-48e2-ae4a-eee3972daf70",
+              "name": "Contacto",
+              "value": "={{ $json.contacto }}",
+              "type": "string"
+            },
+            {
+              "id": "e1478559-14f1-47a3-a221-8cf2be40f2c9",
+              "name": "Material",
+              "value": "={{ $json.material }}",
+              "type": "string"
+            },
+            {
+              "id": "e322978a-3ce0-48db-917a-8ed78afff533",
+              "name": "Ancho",
+              "value": "={{ $json.ancho }}",
+              "type": "number"
+            },
+            {
+              "id": "419fac30-b09a-4d0d-8a87-1cec1765e869",
+              "name": "Alto",
+              "value": "={{ $json.alto }}",
+              "type": "number"
+            },
+            {
+              "id": "491542dc-f807-4c28-b998-b75849016a16",
+              "name": "Piezas",
+              "value": "={{ $json.piezas }}",
+              "type": "number"
+            },
+            {
+              "id": "c0e76fe0-82d0-4167-8e3b-4b199e87e789",
+              "name": "Se necesita instalacion",
+              "value": "={{ $json.instalacion }}",
+              "type": "boolean"
+            },
+            {
+              "id": "49bbc8f6-67d8-47dd-9cc8-e4fe72413133",
+              "name": "Con urgencia",
+              "value": "={{ $json.urgencia }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        448
+      ],
+      "id": "0f6b8a42-111f-45b5-9616-ef1d34865604",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "360b649e-3a39-45f6-9cf6-2dc043d7d27d",
+              "name": "message",
+              "value": "={{ $json.mensaje }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        864
+      ],
+      "id": "0e58e96a-654d-4897-8f91-79ee12cf3cf5",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        208,
+        864
+      ],
+      "id": "3a294dba-d0d2-4c9a-9e59-fb10970e2d95",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c3cdf180-680b-49cf-934d-1db9c9f7b407",
+              "leftValue": "={{ $json.pedido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        464
+      ],
+      "id": "9368ba32-1373-490d-9766-0217137bfb8c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook1').item.json.headers['x-real-ip'] }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1056,
+        704
+      ],
+      "id": "7c080426-7a18-4eae-9d47-43d4dd4e8f4a",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "71fdde43-6dcd-481c-ae6e-77a460e9e6d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c3679ccfc1bb3a493cfb0d63e2a468dab4addbeca62b77b992ed76cb85f37450"
+  },
+  "id": "ez8I8thdJurf5GY5",
+  "tags": []
+}

@@ -58,7 +58,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        736,
+        1040,
         16
       ],
       "id": "8e99c4f7-0187-4736-8cc0-270424f2cc2d",
@@ -146,6 +146,19 @@
       ],
       "id": "befbd56a-61d4-447d-a67e-a3eb4aa3aa81",
       "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos todos los items del nodo anterior\nconst inputItems = $input.all().map(item => item.json);\n\n// Inicializamos salida\nconst output = { materials: [] };\n\n// Recorremos todos los items\nfor (const item of inputItems) {\n  // Si tiene 'Nombre' y 'MXN/m²', es material\n  if (item.Nombre && item['MXN/m²'] !== undefined) {\n    output.materials.push({\n      'row_number': item.row_number,\n      'Nombre': item.Nombre,\n      'MXN/m²': item['MXN/m²']\n    });\n  } else {\n    // Para cualquier otro campo, agregamos al objeto principal\n    for (const [key, value] of Object.entries(item)) {\n      // No sobreescribimos 'materials'\n      if (key !== 'Nombre' && key !== 'MXN/m²') {\n        output[key] = value;\n      }\n    }\n  }\n}\n\n// Devolvemos un solo item\nreturn [\n  {\n    json: output\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        16
+      ],
+      "id": "f7dff4c6-37fb-4e55-800e-1c8f9d0425de",
+      "name": "Code2"
     }
   ],
   "pinData": {},
@@ -214,7 +227,7 @@
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Code2",
             "type": "main",
             "index": 0
           }
@@ -236,13 +249,24 @@
           }
         ]
       ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "4a36b81c-4f57-4b78-8257-4d9896ee964e",
+  "versionId": "e0ca72d5-4847-490a-8b03-2d2008e61968",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c3679ccfc1bb3a493cfb0d63e2a468dab4addbeca62b77b992ed76cb85f37450"
